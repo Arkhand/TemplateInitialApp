@@ -123,7 +123,7 @@ sap.ui.define([
 			return this.getOwnerComponent().getModel("i18n").getResourceBundle();
 		},
 		
-		setBussy: function (bValue, sView = "appView") {
+		setbusy: function (bValue, sView = "appView") {
 			this.getModel(sView).setProperty("/busy", bValue);
 		},
 

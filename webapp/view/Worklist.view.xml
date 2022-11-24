@@ -13,7 +13,6 @@
             toggleHeaderOnTitleClick="false"
             showFooter="{= ${message>/}.length > 0 }"
             headerExpanded="true"
-            title="{i18n>title}"
             >
     	
 		<semantic:titleHeading>
