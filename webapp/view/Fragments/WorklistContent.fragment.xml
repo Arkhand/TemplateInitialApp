@@ -1,0 +1,5 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	
+		<Text text="Mate, café, Harina y palmitos, Yerba, mermelada, Cacao, picadillo Paté, caballa, Arroz y arvejas Sardinas y atún... Choclo y lentejas .... Marolio le da sabor a tu vida Marolio esta desde el comienzo del día"/>
+
+</core:FragmentDefinition>

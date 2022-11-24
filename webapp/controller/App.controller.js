@@ -1,0 +1,49 @@
+sap.ui.define(
+    [
+      "./BaseController",
+      "sap/ui/model/json/JSONModel"
+    ],
+    function(
+      BaseController,
+      JSONModel
+      ) {
+      "use strict";
+  
+      return BaseController.extend("com.blueboot.TemplateApptroller.App", {
+
+        oDataModel: null,
+        oGlobalModel: null,
+        oMessageManager: null,
+
+        onInit() {
+
+          //Models
+          this.oDataModel = sap.ui.getCore().getModel("PM_SRV");
+          this.oGlobalModel = sap.ui.getCore().getModel();
+          this.createOdataPromse(this.oDataModel);
+          
+          this.oMessageManager = sap.ui.getCore().getMessageManager();
+          this.getView().setModel(this.oMessageManager.getMessageModel(), "message");
+          this.oMessageManager.registerObject(this.getView(), true);
+          
+          var oViewModel,
+            fnSetAppNotBusy,
+            iOriginalBusyDelay = this.getView().getBusyIndicatorDelay();
+
+          oViewModel = new JSONModel({
+            busy : true,
+            delay : 0
+          });
+          this.setModel(oViewModel, "appView");
+          fnSetAppNotBusy = function() {
+            oViewModel.setProperty("/busy", false);
+            oViewModel.setProperty("/delay", iOriginalBusyDelay);
+          };
+          this.getOwnerComponent().getModel("PM_SRV").metadataLoaded().then(fnSetAppNotBusy);
+          this.getOwnerComponent().getModel("PM_SRV").attachMetadataFailed(fnSetAppNotBusy);
+
+        }
+      });
+    }
+  );
+  
