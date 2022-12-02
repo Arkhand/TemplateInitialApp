@@ -47,7 +47,6 @@ sap.ui.define([
 		},
 
 		getBase64: function (file) {
-			debugger
 			var reader = new FileReader();
 			return new Promise((resolve, reject) => {
 				reader.readAsDataURL(file);
@@ -98,7 +97,7 @@ sap.ui.define([
 			if (sPreviousHash !== undefined) {
 				window.history.go(-1);
 			} else {
-				this.getRouter().navTo("TargetWorklist", {}, true /*no history*/);
+				this.getRouter().navTo("RouteSelection", {}, true /*no history*/);
 			}
 		},
 		
@@ -123,8 +122,8 @@ sap.ui.define([
 			return this.getOwnerComponent().getModel("i18n").getResourceBundle();
 		},
 		
-		setbusy: function (bValue, sView = "appView") {
-			this.getModel(sView).setProperty("/busy", bValue);
+		setBusy: function (bValue, sView = "appView") {
+			this.set("/"+ sView + "/busy", bValue);
 		},
 
 		getText: function (sTextKey) {

@@ -15,34 +15,48 @@ sap.ui.define(
         oGlobalModel: null,
         oMessageManager: null,
 
-        onInit() {
-
-          //Models
-          this.oDataModel = sap.ui.getCore().getModel("PM_SRV");
-          this.oGlobalModel = sap.ui.getCore().getModel();
-          this.createOdataPromse(this.oDataModel);
-          
-          this.oMessageManager = sap.ui.getCore().getMessageManager();
-          this.getView().setModel(this.oMessageManager.getMessageModel(), "message");
-          this.oMessageManager.registerObject(this.getView(), true);
-          
-          var oViewModel,
-            fnSetAppNotBusy,
-            iOriginalBusyDelay = this.getView().getBusyIndicatorDelay();
-
-          oViewModel = new JSONModel({
-            busy : true,
-            delay : 0
-          });
-          this.setModel(oViewModel, "appView");
-          fnSetAppNotBusy = function() {
-            oViewModel.setProperty("/busy", false);
-            oViewModel.setProperty("/delay", iOriginalBusyDelay);
-          };
-          this.getOwnerComponent().getModel("PM_SRV").metadataLoaded().then(fnSetAppNotBusy);
-          this.getOwnerComponent().getModel("PM_SRV").attachMetadataFailed(fnSetAppNotBusy);
-
-        }
+	      onInit() {
+	
+	        this.initializations()
+	
+	        //Models
+	        this.oDataModel = sap.ui.getCore().getModel("PM_SRV");
+	        this.oGlobalModel = sap.ui.getCore().getModel();
+	        this.createOdataPromse(this.oDataModel);
+	
+	        this.oMessageManager = sap.ui.getCore().getMessageManager();
+	        this.getView().setModel(this.oMessageManager.getMessageModel(), "message");
+	        this.oMessageManager.registerObject(this.getView(), true);
+	
+	        this.set('/appView', { busy: true, delay: 0 })
+	        var fnSetAppNotBusy = function () {
+	          this.set("/appView/busy", false);
+	          this.set("/appView/delay", this.getView().getBusyIndicatorDelay());
+	        }.bind(this)
+	
+	        this.getOwnerComponent().getModel("PM_SRV").metadataLoaded().then(fnSetAppNotBusy);
+	        this.getOwnerComponent().getModel("PM_SRV").attachMetadataFailed(fnSetAppNotBusy);
+	
+	        
+	      },
+	
+	      initializations: function () {
+	        
+	        if (!this.get('/Selection')) {
+	          var oSelection = {
+	            TaskListType: {
+	              A: false,
+	              E: true,
+	              T: false,
+	            },
+	            Equipment:'',
+	            FunctLoc:'',
+	            TaskList:'',
+	          }
+	          this.set('/Selection', oSelection)
+	        }
+	        
+	      }
       });
     }
   );
