@@ -25,7 +25,7 @@ sap.ui.define([
 	var ValueState = coreLibrary.ValueState;
 	var MessageType = coreLibrary.MessageType;
 
-	return Controller.extend("com.blueboot.smartplanning.controller.BaseController", {
+	return Controller.extend("com.blueboot.TemplateApp.controller.BaseController", {
 
 		set: function(sProperty, value){
 			if (!sProperty) {

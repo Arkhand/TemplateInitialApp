@@ -9,7 +9,7 @@ sap.ui.define(
       ) {
       "use strict";
   
-      return BaseController.extend("com.blueboot.TemplateApptroller.App", {
+      return BaseController.extend("com.blueboot.TemplateApp.controller.App", {
 
         oDataModel: null,
         oGlobalModel: null,
