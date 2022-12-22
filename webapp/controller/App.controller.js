@@ -42,21 +42,8 @@ sap.ui.define(
 	
 	      initializations: function () {
 	        
-	        if (!this.get('/Selection')) {
-	          var oSelection = {
-	            TaskListType: {
-	              A: false,
-	              E: true,
-	              T: false,
-	            },
-	            Equipment:'',
-	            FunctLoc:'',
-	            TaskList:'',
-	          }
-	          this.set('/Selection', oSelection)
-	        }
-	        
 	      }
+	      
       });
     }
   );

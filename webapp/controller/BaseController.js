@@ -176,7 +176,12 @@ sap.ui.define([
 					oMessagePopover.openBy(oSourceControl) 
 				}
 			});
-		},		
+		},	
+		
+		multiInputValidator: function (args) {
+			var text = args.text;
+			return new sap.m.Token({ key: text, text: text });
+		},
 
 	});
 
