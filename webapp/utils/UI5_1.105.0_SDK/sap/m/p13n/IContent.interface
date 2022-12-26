@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<interface xmlns="http://www.sap.com/sap.ui.library.xsd">
+    <name>p13n/IContent</name>
+    <derived/>
+    <documentation>Interface for P13nPopup which are suitable as content for the &lt;code&gt;sap.m.p13n.Popup&lt;/code&gt;.
+Implementation of this interface should include the following methods:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;getTitle&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;</documentation>
+    <since>1.97</since>
+    <developmentState state="experimental"></developmentState>
+</interface>

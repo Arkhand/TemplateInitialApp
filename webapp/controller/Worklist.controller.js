@@ -3,13 +3,15 @@ sap.ui.define([
 	"../utils/formatter",
 	"../utils/FilterUtils",
 	"../utils/oDataActions",
-	"../controller/VH"
+	"../utils/TableP13n",
+	"../controller/VH",
 ], function (
 	BaseController,
 	formatter,
 	FilterUtils,
 	oDataActions,
-	VH,
+	TableP13n,
+	VH
 ) {
 	"use strict";
 

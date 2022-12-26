@@ -1,0 +1,6 @@
+/*!
+ * OpenUI5
+ * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
+ */
+sap.ui.define(["sap/ui/base/Object","sap/ui/core/util/reflection/JsControlTreeModifier"],function(B,J){"use strict";var m;var M=B.extend("sap.m.p13n.modification.ModificationHandler");var i=new WeakMap();M.prototype.processChanges=function(c,o){var C=[];c.forEach(function(a){var b=a.changeSpecificData.content;var d=a.selectorElement;var s=a.changeSpecificData.changeType;var t={getContent:function(){return b;},getChangeType:function(){return s;},getControl:function(){return d;},setRevertData:function(){}};var p=new Promise(function(r){sap.ui.require(["sap/m/flexibility/EngineFlex"],function(E){var e=E[s].changeHandler.applyChange(t,d,{modifier:J});r(e);});});C.push(p);});return Promise.all(C);};M.prototype.waitForChanges=function(p,o){return Promise.resolve();};M.prototype.reset=function(p,o){var c=p.selector;return sap.m.p13n.Engine.getInstance().applyState(c,i.get(c),true);};M.prototype.initialize=function(c){var p,I;p=sap.m.p13n.Engine.getInstance().retrieveState(c).then(function(r){I=r;i.set(c,I);});return p;};M.prototype.isModificationSupported=function(p,o){return false;};M.getInstance=function(){if(!m){m=new M();}return m;};return M;});
