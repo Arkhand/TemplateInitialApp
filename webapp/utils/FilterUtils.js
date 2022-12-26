@@ -33,7 +33,7 @@ sap.ui.define([
 		}
 		
 		setCustomVariantManage(){
-			this.oFilterBar.attachBeforeVariantSave( this._onBeforeVariantSave.bind(this) )
+			this.oFilterBar.beforeVariantFetch( this._onBeforeVariantSave.bind(this) )
 			this.oFilterBar.attachAfterVariantLoad( this._onAfterVariantLoad.bind(this) )
 		}
 		
