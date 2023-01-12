@@ -118,6 +118,8 @@ sap.ui.define([
 						return this.getComboBoxFilter( oComponent, sProperty);
 					case 'sap.m.ComboBox':
 						return this.getComboBoxFilter( oComponent, sProperty); 
+					case 'sap.m.DynamicDateRange':
+						return this.getDynamicDateRangeFilter(oComponent, sProperty);
 				}
 		}
 		
@@ -145,6 +147,8 @@ sap.ui.define([
 					return oComponent.getSelectedKeys();
 				case 'sap.m.ComboBox':
 					return oComponent.getSelectedKeys();
+				case 'sap.m.DynamicDateRange':
+					return oComponent.getValue();
 			}
 		}
 		
@@ -195,6 +199,9 @@ sap.ui.define([
 				case 'sap.m.ComboBox':
 					oComponent.setSelectedKeys(data);
 					break
+				case 'sap.m.DynamicDateRange':
+					oComponent.setValue(data)
+					break;
 			}
 		}
 		
@@ -248,6 +255,36 @@ sap.ui.define([
 				}));
 			}
 			return aFilters;
+		}
+		
+		getDynamicDateRangeFilter(oDynamicDate, sProperty) {
+			var aFilters = [];
+			var oValue = oDynamicDate.getValue();
+			if (oValue) {
+				if (oValue.operator === "PARSEERROR") return aFilters
+				var aDates = DynamicDateUtil.toDates(oValue);
+				if (oValue.operator === "FROM" || oValue.operator === "FROMDATETIME") {
+					aFilters.push(new Filter({
+						path: sProperty,
+						operator: FilterOperator.GT,
+						value1: aDates[0].toLocaleDateString('en-GB').split('/').reverse().join(''),
+					}));
+				} else if (oValue.operator === "TO" || oValue.operator === "TODATETIME") {
+					aFilters.push(new Filter({
+						path: sProperty,
+						operator: FilterOperator.LT,
+						value1: aDates[0].toLocaleDateString('en-GB').split('/').reverse().join(''),
+					}));
+				} else {
+					aFilters.push(new Filter({
+						path: sProperty,
+						operator: FilterOperator.BT,
+						value1: aDates[0].oDate.toLocaleDateString('en-GB').split('/').reverse().join(''),
+						value2: aDates[1].oDate.toLocaleDateString('en-GB').split('/').reverse().join('')
+					}));
+				}
+			}
+			return aFilters
 		}
 		
 		getMultiInputFilter( oMultiInput , sProperty){
