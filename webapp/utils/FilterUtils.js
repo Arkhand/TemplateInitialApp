@@ -148,7 +148,7 @@ sap.ui.define([
 				case 'sap.m.ComboBox':
 					return oComponent.getSelectedKeys();
 				case 'sap.m.DynamicDateRange':
-					return oComponent.getValue();
+					return oComponent.getValue() ? oComponent.getValue() : null;
 			}
 		}
 		
