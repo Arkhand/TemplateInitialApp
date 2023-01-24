@@ -200,6 +200,7 @@ sap.ui.define([
 					oComponent.setSelectedKeys(data);
 					break
 				case 'sap.m.DynamicDateRange':
+					if (data.operator === 'DATE' ) data.values = data.values.map(e=>new Date(e))
 					oComponent.setValue(data)
 					break;
 			}
