@@ -1,32 +1,3 @@
-sap.ui.define([
-	'sap/ui/comp/library',
-	'sap/ui/core/mvc/Controller',
-	'sap/ui/model/json/JSONModel',
-	'sap/ui/model/type/String',
-	'sap/m/ColumnListItem',
-	'sap/m/Label',
-	'sap/m/SearchField',
-	'sap/m/Token',
-	'sap/ui/model/Filter',
-	'sap/ui/model/FilterOperator',
-	'sap/ui/core/Fragment',
-	"sap/ui/comp/valuehelpdialog/ValueHelpDialog"
-], function (
-	compLibrary,
-	Controller,
-	JSONModel,
-	TypeString,
-	ColumnListItem,
-	Label,
-	SearchField,
-	Token,
-	Filter,
-	FilterOperator,
-	Fragment,
-	ValueHelpDialog
-) {
-	"use strict";
-	
 	/*
 		Ej parametros:
 
@@ -74,6 +45,38 @@ sap.ui.define([
 		afterSelect -->  recibe un function callback q se ejecuta luego de seleccionar los valores, Recive los parametros ( oToken, aValuesSelected )
 		afterSet --> recibe un function callback q se ejecuta luego de setear los valores al input o multInput 
 	*/
+
+
+sap.ui.define([
+	'sap/ui/comp/library',
+	'sap/ui/core/mvc/Controller',
+	'sap/ui/model/json/JSONModel',
+	'sap/ui/model/type/String',
+	'sap/m/ColumnListItem',
+	'sap/m/Label',
+	'sap/m/SearchField',
+	'sap/m/Token',
+	'sap/ui/model/Filter',
+	'sap/ui/model/FilterOperator',
+	'sap/ui/core/Fragment',
+	"sap/ui/comp/valuehelpdialog/ValueHelpDialog"
+], function (
+	compLibrary,
+	Controller,
+	JSONModel,
+	TypeString,
+	ColumnListItem,
+	Label,
+	SearchField,
+	Token,
+	Filter,
+	FilterOperator,
+	Fragment,
+	ValueHelpDialog
+) {
+	"use strict";
+	
+
 	return class ValueHelp {
 		
 		constructor(oProps) {
@@ -106,8 +109,12 @@ sap.ui.define([
 			}.bind(this))
 
 			this._determineMultiSelect()
+			
+			this.supportRanges = !!(oProps.supportRanges && this.supportMultiselect)
+			this.supportRangesOnly = !!(oProps.supportRangesOnly && this.supportMultiselect)
 
 			this._oValueHelpDialog = new ValueHelpDialog({
+				maxConditions: '1', //Se setea una sola condicion para Ranges ( En BackEnd hay probelmas al recibir mas de una condicion Exclude )
 				basicSearchText: this.basicSearchText,
 				title: this.title,
 				supportMultiselect: this.supportMultiselect,
@@ -158,7 +165,7 @@ sap.ui.define([
 		}
 		
 		afterSelect(fCallBack){
-        	this.afterSelect = fCallBack;
+        	this.afterSelectCallback = fCallBack;
         }
         
 		afterSet(fCallBack){
@@ -184,7 +191,7 @@ sap.ui.define([
         _buildInputs(){
         	this.aFilterInputs = []
         	this.aFilterGroupItem = []
-        	
+
         	this.aFitlers.forEach(function (oCol) {
 		
 				let oFilterInput = new sap.m.Input({
@@ -218,18 +225,6 @@ sap.ui.define([
         	this.oTable = oTable
         	this.oColModel = new JSONModel({ cols: this.aCols });
 			oTable.setModel(this.oColModel, "columns");
-
-			// if (oTable.bindRows && oTable.getColumns().length == 0) {
-			// 	this.aCols.map(function(oCol){
-			// 		oTable.addColumn( new sap.ui.table.Column({label: oCol.label, template: oCol.template }) );
-			// 	}.bind(this))
-			// }
-			// if (oTable.bindItems  && oTable.getColumns().length  0 ) {
-			// 	this.aCols.map(function(oCol){
-			// 		oTable.addColumn( new sap.m.Column( {header: new sap.m.Label({text: "Product Code"} ) }));
-			// 	}.bind(this))
-			// }
-			// this._oValueHelpDialog.update();
 			
 			if (!this.waitGoButton) {
 				this._onFilterBarSearch();
@@ -241,8 +236,7 @@ sap.ui.define([
         	
         	oTable.setModel(this.oModel);
 			if (oTable.bindRows) {
-				// oTable.bindAggregation("rows", { path: this.sEntity } );
-				oTable.bindAggregation("rows", { path: this.sEntity, filters: oFilter, parameters: { countMode: sap.ui.model.odata.CountMode.None} } );
+				oTable.bindAggregation("rows", { path: this.sEntity, filters: oFilter.aFilters.length ? oFilter : [] , parameters: { countMode: sap.ui.model.odata.CountMode.None} } );
 			}
 			if (oTable.bindItems) {
 				
@@ -254,7 +248,7 @@ sap.ui.define([
 					});
 				}
 				
-				oTable.bindAggregation("items", this.sEntity, fTemplate.bind(this) , null, oFilter );
+				oTable.bindAggregation("items", this.sEntity, fTemplate.bind(this) , null, oFilter.aFilters.length ? oFilter : [] );
 			}
 			
 			this.bTableBinded = true;
@@ -265,13 +259,13 @@ sap.ui.define([
 		_onValueHelpOkPress(oEvent) {
 			var aTokens = oEvent.getParameter("tokens");
 			this.selectedTokens = aTokens;
-            if (this.afterSelect) {
+            if (this.afterSelectCallback) {
 				let aSelectedData = []
 				let aKeys = []
 				if (this.oTable.getBinding("rows")) {
 					try {
 						aKeys = this.oTable.getSelectedIndices().map(function (iIndex) { return this.oTable.getBinding("rows").aKeys[iIndex] }.bind(this))
-						aSelectedData = aKeys.map(function (sPath) { return { ... this.oModel.getProperty("/" + sPath) } }.bind(this))
+						aSelectedData = aKeys.map(function (sPath) { return { ...this.oModel.getProperty("/" + sPath) } }.bind(this))
 					} catch { }
 					try {
 						if (!aSelectedData.length) {
@@ -284,7 +278,7 @@ sap.ui.define([
 						aSelectedData = aKeys.map(function (sPath) { return { ... this.oModel.getProperty(sPath) } }.bind(this))
 					} catch { }
 				}
-				this.afterSelect(aTokens, aSelectedData)
+				this.afterSelectCallback(aTokens, aSelectedData)
 			}
 			switch (this.oControl.getMetadata().getName()) {
 			case 'sap.m.MultiInput':
@@ -310,6 +304,7 @@ sap.ui.define([
 		}
 
 		_onFilterBarSearch() {
+
 			var sSearchQuery = this._oBasicSearchField.getValue()
 			var aFilters = this.aFilterInputs.reduce(function (aResult, oControl) {
 				if (oControl.getValue()) {
@@ -321,6 +316,16 @@ sap.ui.define([
 				}
 				return aResult;
 			}, []);
+
+			var aDefaultsFilters = this.aCols.filter(oCol=> !oCol.filtrable && !!oCol.defaultFilterValue )
+			aDefaultsFilters.map(function (oCol) {
+				aFilters.push(new Filter({
+					path: oCol.template,
+					operator: FilterOperator.EQ,
+					value1: oCol.defaultFilterValue
+				}));
+			})
+
 			if (sSearchQuery) {
 				let aQueryFilters = []
 				this.aCols.forEach(function (oCol) {
@@ -347,18 +352,8 @@ sap.ui.define([
 		_filterTable(oFilter) {
 			var oValueHelpDialog = this._oValueHelpDialog;
 			oValueHelpDialog.getTableAsync().then(function (oTable) {
-				
-				// var bFirstBind = 
+			
 				this._bindTable(oTable, oFilter)
-				
-				// if (!bFirstBind){
-				// 	if (oTable.bindRows) {
-				// 		oTable.getBinding("rows").filter(oFilter);
-				// 	}
-				// 	if (oTable.bindItems) {
-				// 		oTable.getBinding("items").filter(oFilter);
-				// 	}
-				// }
 				
 				oValueHelpDialog.update();
 				oTable.updateBindings(true)
