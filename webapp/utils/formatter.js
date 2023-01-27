@@ -14,8 +14,7 @@ sap.ui.define([
 		},
 
 		leadingZeros: function (number) {
-			var numb = parseInt(number, 10);
-			if (isNaN(numb)) { //Si no es parseable lo devuelvo como esta
+			if (isNaN(number)) { //Si no es parseable lo devuelvo como esta
 				return number;
 			} else {
 				return parseInt(number, 10);
