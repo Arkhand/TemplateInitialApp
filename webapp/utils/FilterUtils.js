@@ -428,9 +428,7 @@ sap.ui.define([
 			
 			var oBookMarkButton = this.getBookMarkButton();
 			var sCurrentVariantId = this.oFilterBar.getVariantManagement().getCurrentVariantId();
-			var sCurrentKey = this.oFilterBar.getVariantManagement().getCurrentVariantKey()
-			var oCurrentVariantItem = this.oFilterBar.getVariantManagement().getItemByKey(sCurrentKey)
-			var sVariantName = oCurrentVariantItem.getText()
+			var sVariantName = this.oFilterBar.getVariantManagement()._getVariantText()
 			var sURL = ''
 			var appTitle = ''
 			
