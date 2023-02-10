@@ -97,30 +97,79 @@ sap.ui.define([
 
 		getControlFilter( oComponent , sProperty = 'DUMMY'){
 			var sControlType = oComponent.getMetadata().getName();
+			
+				var aFilters = []
 				switch (sControlType) {
 					case 'sap.m.Input':
-						return this.getInputFilter( oComponent, sProperty);
+						aFilters = this.getInputFilter( oComponent, sProperty);
+						break
 					case 'sap.m.MultiInput':
-						return this.getMultiInputFilter( oComponent, sProperty);
+						aFilters = this.getMultiInputFilter( oComponent, sProperty);
+						break
 					case 'sap.ui.comp.smartmultiinput.SmartMultiInput':
-						return this.getMultiInputFilter( oComponent, sProperty);
+						aFilters = this.getMultiInputFilter( oComponent, sProperty);
+						break
 					case 'sap.ui.comp.smartmultiinput.MultiComboBox':
-						return this.getMultiComboBoxFilter( oComponent, sProperty);
+						aFilters = this.getMultiComboBoxFilter( oComponent, sProperty);
+						break
 					case 'sap.m.MultiComboBox':
-						return this.getMultiComboBoxFilter( oComponent, sProperty); 
+						aFilters = this.getMultiComboBoxFilter( oComponent, sProperty); 
+						break
 					case 'sap.m.DateRangeSelection':
-						return this.getDateRangeFilter( oComponent, sProperty);
+						aFilters = this.getDateRangeFilter( oComponent, sProperty);
+						break
 					case 'sap.m.DatePicker':
-						return this.DatePickerFilter( oComponent, sProperty);
+						aFilters = this.DatePickerFilter( oComponent, sProperty);
+						break
 					case 'sap.ui.comp.smartfield.SmartField':
-						return this.getInputFilter( oComponent, sProperty);
+						aFilters = this.getInputFilter( oComponent, sProperty);
+						break
 					case 'sap.ui.comp.smartmultiinput.ComboBox':
-						return this.getComboBoxFilter( oComponent, sProperty);
+						aFilters = this.getComboBoxFilter( oComponent, sProperty);
+						break
 					case 'sap.m.ComboBox':
-						return this.getComboBoxFilter( oComponent, sProperty); 
+						aFilters = this.getComboBoxFilter( oComponent, sProperty); 
+						break
 					case 'sap.m.DynamicDateRange':
-						return this.getDynamicDateRangeFilter(oComponent, sProperty);
+						aFilters = this.getDynamicDateRangeFilter(oComponent, sProperty);
+						break
 				}
+				
+				aFilters.forEach(oFilter=>{ 
+				    if ((oFilter.sOperator === FilterOperator.EQ || oFilter.sOperator === FilterOperator.NE)  && oFilter.oValue1) {
+				        if ( oFilter.oValue1.endsWith('*') && oFilter.oValue1.startsWith('*') ){
+				        	if (oFilter.oValue1.length >= 3) {
+				        		oFilter.oValue1 = oFilter.oValue1.slice(0, -1)
+				        		oFilter.oValue1 = oFilter.oValue1.slice( 1 );
+				        	}
+				        	if (oFilter.sOperator === FilterOperator.EQ) {
+				        		oFilter.sOperator = FilterOperator.Contains
+				        	} else {
+				        		oFilter.sOperator = FilterOperator.NotContains
+				        	}
+				        } 
+				        if ( oFilter.oValue1.startsWith('*') ) {
+				        	oFilter.oValue1 = oFilter.oValue1.slice( 1 );
+				        	if (oFilter.sOperator === FilterOperator.EQ) {
+				        		oFilter.sOperator = FilterOperator.EndsWith
+				        	} else {
+				        		oFilter.sOperator = FilterOperator.NotEndsWith
+				        	}
+				        }
+				        if ( oFilter.oValue1.endsWith('*') ) {
+				        	oFilter.oValue1 = oFilter.oValue1.slice(0, -1)
+				        	if (oFilter.sOperator === FilterOperator.EQ) {
+				        		oFilter.sOperator = FilterOperator.StartsWith
+				        	} else {
+				        		oFilter.sOperator = FilterOperator.NotStartsWith
+				        	}
+				        }
+				    }
+				 })
+ 
+				return aFilters
+				
+				
 		}
 		
 		getVariantDataComponent(oComponent) {
@@ -361,17 +410,20 @@ sap.ui.define([
 			return aTokens.map(function(oToken){
 				return { 
 					key: oToken.getKey(),
-					text: oToken.getText() 
+					text: oToken.getText(),
+					range: oToken.data().range
 				}
 			})
 		}
 		
 		getTokensFromValues(aValues){
 			return aValues.map(function(oValue){
-				return new Token({
+				let oToken = new Token({
 					key: oValue.key,
 					text: oValue.text
 				} ) 
+				if (oValue.range) oToken.data("range", oValue.range)
+				return oToken
 			})
 		}
 		

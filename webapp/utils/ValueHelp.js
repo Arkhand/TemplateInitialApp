@@ -9,6 +9,8 @@
 		basicSearch = si soporta busqueda por texto libre ej: false
 		waitGoButton = espera por el boton de GO antes de disparar una busqueda (valor por defecto true) ej true
 		aFilters = (opcional) Filtros q se van a aplicar siempre
+		supportRanges  (opcional) true false si soporta rangos
+		supportRangesOnly
 		
 		modelo de columnas:
 		aCols = [
