@@ -279,9 +279,9 @@ sap.ui.define([
         _onValueHelpOkPress(oEvent) {
             var aTokens = oEvent.getParameter("tokens");
             this.selectedTokens = aTokens;
-
+			
+			let aSelectedData = []
             if (this.afterSelectCallback) {
-                let aSelectedData = []
                 let aKeys = []
                 if (this.oTable.getBinding("rows")) {
                     try {
