@@ -9,6 +9,8 @@
     basicSearch = si soporta busqueda por texto libre ej: false
     waitGoButton = espera por el boton de GO antes de disparar una busqueda (valor por defecto true) ej true
     aFilters = (opcional) Filtros q se van a aplicar siempre
+    supportRanges  (opcional) true false si soporta rangos
+    supportRangesOnly (opcional) si soporta solo rangos
     
     modelo de columnas:
     aCols = [
@@ -42,7 +44,7 @@
     
     Metodos:
     open --> Abre el VH
-    afterSelect -->  recibe un function callback q se ejecuta luego de seleccionar los valores, Recive los parametros ( oToken, aValuesSelected )
+    afterSelect --> recibe un function callback q se ejecuta luego de seleccionar los valores, Recive los parametros ( oToken, aValuesSelected )
     afterSet --> recibe un function callback q se ejecuta luego de setear los valores al input o multInput 
 */
 
@@ -64,10 +66,18 @@ sap.ui.define([
 
         constructor(oProps) {
             if (!oProps.oControl) throw "Complete oControl"
-            if (!oProps.oModel) throw "Complete oModel"
-            if (!oProps.sEntity) throw "Complete sEntity"
-            if (!oProps.aCols) throw "Complete aCols"
+            if (!oProps.supportRangesOnly && !oProps.oModel) throw "Complete oModel"
+            if (!oProps.supportRangesOnly && !oProps.sEntity) throw "Complete sEntity"
+            if (!oProps.supportRangesOnly && !oProps.aCols) throw "Complete aCols"
 
+            this.determineContextProps(oProps)
+            this.createVhDialog()
+            this.createFilterBar()
+
+            this._oValueHelpDialog.getTableAsync().then(this._prepareTable.bind(this));
+        }
+
+        determineContextProps(oProps){
             this.oControl = oProps.oControl
             this.oModel = oProps.oModel
             this.sEntity = oProps.sEntity
@@ -80,6 +90,7 @@ sap.ui.define([
             this.supportRangesOnly = !!oProps.supportRangesOnly
             this.aAlwaysFilters = oProps.aFilters
             this.waitGoButton = !!oProps.waitGoButton
+
             this.aCols.forEach(function (oCol) {
                 if (oCol.key) {
                     this.key = oCol.template
@@ -93,14 +104,16 @@ sap.ui.define([
 
             this.supportRanges = !!(oProps.supportRanges && this.supportMultiselect)
             this.supportRangesOnly = !!(oProps.supportRangesOnly && this.supportMultiselect)
+        }
 
+        createVhDialog() {
             this._oValueHelpDialog = new ValueHelpDialog({
-                maxConditions: '1', //Se setea una sola condicion para Ranges ( En BackEnd hay probelmas al recibir mas de una condicion Exclude )
+                // maxConditions: '1', //Se setea una sola condicion para Ranges ( En BackEnd hay probelmas al recibir mas de una condicion Exclude )
                 basicSearchText: this.basicSearchText,
                 title: this.title,
                 supportMultiselect: this.supportMultiselect,
                 supportRanges: this.supportRanges,
-                supportRangesOnly: false,
+                supportRangesOnly: this.supportRangesOnly,
                 key: this.key,
                 descriptionKey: this.descriptionKey,
                 ok: this._onValueHelpOkPress.bind(this),
@@ -110,7 +123,7 @@ sap.ui.define([
 
             //Ocultar el filtro de advanced search en Celulares
             this._oValueHelpDialog.addDelegate({
-                onAfterRendering: function () {
+                onAfterRendering: function() {
                     if (this._oValueHelpDialog._oAdvancedSearchLink) this._oValueHelpDialog._oAdvancedSearchLink.setVisible(false)
                 }.bind(this)
             });
@@ -124,6 +137,12 @@ sap.ui.define([
                 })
             }]);
 
+            let aInputTokens = this.oControl.getTokens()
+			if (aInputTokens && aInputTokens.length) this._oValueHelpDialog.setTokens(aInputTokens)
+
+        }
+
+        createFilterBar(){
             this._buildInputs()
 
             var oFilterBar = new sap.ui.comp.filterbar.FilterBar({
@@ -136,9 +155,6 @@ sap.ui.define([
             this._oValueHelpDialog.setFilterBar(oFilterBar)
 
             if (this.basicSearch) this._oValueHelpDialog.getFilterBar().setBasicSearch(this._oBasicSearchField);
-
-            this._oValueHelpDialog.getTableAsync().then(this._prepareTable.bind(this));
-
         }
 
         open() {
@@ -195,7 +211,6 @@ sap.ui.define([
                 oFilterInput.onsapenter = ((oEvent) => {
                     this._onFilterBarSearch()
                 });
-
 
                 this.aFilterInputs.push(oFilterInput)
                 this.aFilterGroupItem.push(new sap.ui.comp.filterbar.FilterGroupItem({
@@ -318,10 +333,7 @@ sap.ui.define([
             this.afterSet();
         }
 
-
-
         _onFilterBarSearch() {
-
             var sSearchQuery = this._oBasicSearchField.getValue()
             var aFilters = this.aFilterInputs.reduce(function (aResult, oControl) {
                 if (oControl.getValue()) {
