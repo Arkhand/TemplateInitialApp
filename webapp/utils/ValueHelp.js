@@ -29,6 +29,8 @@
             "supportRanges":		     // (opcional) uso rango
             "supportRangesOnly":		 // (opcional) rango obligatorios.
             "maxLength",				 // (opcional) Es necesario solo para usar RANGOS
+            "filterType":                // (opcional) String, Date, Time
+            "valueFormat"                // (opcional) value format para date y time por defecto 'yyyyMMdd' y 'hhmmss'
         },
         {
             "label": "Product Name",
@@ -98,6 +100,7 @@ sap.ui.define([
                     this.title = oCol.label
                     this.maxLengthKey = oCol.maxLength
                 }
+                oCol.filterType = oCol.filterType ? oCol.filterType : 'String'
             }.bind(this))
 
             this._determineMultiSelect()
@@ -198,15 +201,38 @@ sap.ui.define([
             this.aFilterGroupItem = []
 
             this.aFitlers.forEach(function (oCol) {
+                
+                let oGetFilterType = {
+                    'String': ()=>{ return new sap.m.Input({
+                            name: oCol.template,
+                            value: oCol.defaultFilterValue ? oCol.defaultFilterValue : '',
+                            showValueHelp: !!oCol.valueHelpRequest,
+                            valueHelpRequest: oCol.valueHelpRequest ? oCol.valueHelpRequest : ''
+                        })
+                    },
+                    'Date': ()=>{ return new sap.m.DatePicker({
+                        name: oCol.template,
+                        value: oCol.defaultFilterValue ? oCol.defaultFilterValue : null,
+                        valueFormat: oCol.valueFormat ? oCol.valueFormat : "yyyyMMdd"
+                    })},
+                    'Time': ()=>{ return new sap.m.TimePicker({
+                        name: oCol.template,
+                        value: oCol.defaultFilterValue ? oCol.defaultFilterValue : null,
+                        valueFormat: oCol.valueFormat ? oCol.valueFormat : "hhmmss"
+                    })}
+                }
 
-                let oFilterInput = new sap.m.Input({
-                    name: oCol.template,
-                    value: oCol.defaultFilterValue ? oCol.defaultFilterValue : '',
-                    showValueHelp: !!oCol.valueHelpRequest,
-                    valueHelpRequest: oCol.valueHelpRequest ? oCol.valueHelpRequest : ''
-                })
+                let oFilterInput = oGetFilterType[oCol.filterType]()
+                
+                if (oCol.FilterOperator) {
+                    oFilterInput.FilterOperator = oCol.FilterOperator
+                }
 
-                oFilterInput.FilterOperator = oCol.FilterOperator ? oCol.FilterOperator : sap.ui.model.FilterOperator.Contains
+                if (!oFilterInput.FilterOperator && oCol.filterType === 'String'){
+                    oFilterInput.FilterOperator = sap.ui.model.FilterOperator.Contains
+                } else {
+                    oFilterInput.FilterOperator = sap.ui.model.FilterOperator.EQ
+                }
 
                 oFilterInput.onsapenter = ((oEvent) => {
                     this._onFilterBarSearch()
