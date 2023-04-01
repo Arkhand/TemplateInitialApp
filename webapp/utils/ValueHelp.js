@@ -104,10 +104,13 @@ sap.ui.define([
             }.bind(this))
 
             this._determineMultiSelect()
-
-            this.supportRanges = !!(oProps.supportRanges && this.supportMultiselect)
-            this.supportRangesOnly = !!(oProps.supportRangesOnly && this.supportMultiselect)
-        }
+	
+			if (this._determineMultiSelect){
+	            this.supportRanges = !!(oProps.supportRanges && this.supportMultiselect)
+	            this.supportRangesOnly = !!(oProps.supportRangesOnly && this.supportMultiselect)
+			}
+				
+		}
 
         createVhDialog() {
             this._oValueHelpDialog = new ValueHelpDialog({
