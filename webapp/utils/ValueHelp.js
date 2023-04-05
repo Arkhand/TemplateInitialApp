@@ -104,13 +104,12 @@ sap.ui.define([
             }.bind(this))
 
             this._determineMultiSelect()
-	
-			if (this._determineMultiSelect){
+
+            if (this._determineMultiSelect){
 	            this.supportRanges = !!(oProps.supportRanges && this.supportMultiselect)
 	            this.supportRangesOnly = !!(oProps.supportRangesOnly && this.supportMultiselect)
 			}
-				
-		}
+        }
 
         createVhDialog() {
             this._oValueHelpDialog = new ValueHelpDialog({
@@ -143,8 +142,10 @@ sap.ui.define([
                 })
             }]);
 
-            let aInputTokens = this.oControl.getTokens()
-			if (aInputTokens && aInputTokens.length) this._oValueHelpDialog.setTokens(aInputTokens)
+            if (this.supportMultiselect){
+	            let aInputTokens = this.oControl.getTokens()
+				if (aInputTokens && aInputTokens.length) this._oValueHelpDialog.setTokens(aInputTokens)
+			}
 
         }
 
