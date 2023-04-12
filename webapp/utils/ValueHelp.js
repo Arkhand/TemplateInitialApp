@@ -296,7 +296,8 @@ sap.ui.define([
         }
 
         _bindTable(oTable, oFilter) {
-            let oFilterToApply = oFilter?.aFilters?.length ? oFilter : null
+            let oFilterToApply = null
+            if (oFilter && oFilter.aFilters && oFilter.aFilters.length) oFilterToApply = oFilter
             oTable.setModel(this.oModel);
 
             if (oTable.bindRows) { //sap.ui.table.Table
