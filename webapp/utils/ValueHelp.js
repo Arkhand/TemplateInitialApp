@@ -84,7 +84,6 @@ sap.ui.define([
             this.oModel = oProps.oModel
             this.sEntity = oProps.sEntity
             this.aFitlers = oProps.aCols.filter(function (oCol) { return !!oCol.filtrable })
-            this.aCols = oProps.aCols.filter(function (oCol) { return !oCol.hideColumn })
             this.title = oProps.title ? oProps.title : ''
             this.basicSearchText = oProps.basicSearchText ? oProps.basicSearchText : ''
             this.basicSearch = oProps.basicSearch ? oProps.basicSearch : false
@@ -93,7 +92,7 @@ sap.ui.define([
             this.aAlwaysFilters = oProps.aFilters
             this.waitGoButton = !!oProps.waitGoButton
 
-            this.aCols.forEach(function (oCol) {
+            oProps.aCols.forEach(function (oCol) {
                 if (oCol.key) {
                     this.key = oCol.template
                     this.descriptionKey = oCol.descriptionKey ? oCol.descriptionKey : oCol.template
@@ -102,6 +101,8 @@ sap.ui.define([
                 }
                 oCol.filterType = oCol.filterType ? oCol.filterType : 'String'
             }.bind(this))
+            
+            this.aCols = oProps.aCols.filter(function (oCol) { return !oCol.hideColumn })
 
             this._determineMultiSelect()
 
