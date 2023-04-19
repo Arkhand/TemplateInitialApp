@@ -76,10 +76,9 @@ sap.ui.define([
 
 			this.aComplexFilters = []
 			this.aMultiFilter = []
-
-			this.oTable.addDelegate({
-				onAfterRendering: this._initAfterRenderTable.call(this)
-			});
+			
+			this.onAfterRendering = {onAfterRendering: this._initAfterRenderTable.bind(this)}
+			this.oTable.addDelegate(this.onAfterRendering);
 			
 			if (this.bFiltrable){
 				this.oTable.getColumns().map(oColumn=>{oColumn.attachColumnMenuOpen(this.onColumnMenuOpen.bind(this))})
@@ -206,6 +205,8 @@ sap.ui.define([
 		}
 		
 		_initAfterRenderTable() {
+			this.oTable.removeDelegate(this.onAfterRendering);
+
 			this.initialState = this._getCurrentState(this.oTable, true)
 			this.bTableAlrredyRender = true
 			
@@ -735,7 +736,6 @@ sap.ui.define([
 			var oVariant = {... oEvent.mParameters}
 			oVariant.aTableData = aTableData
 			
-			debugger             
 			if (this.customDataSaveCallback){
 				oVariant.customData = this.customDataSaveCallback()
 			}
