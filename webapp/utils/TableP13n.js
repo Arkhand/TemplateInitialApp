@@ -293,9 +293,10 @@ sap.ui.define([
 			})
 			
 			if (this.aMultiFilter.length > 0){ 
-				this.oTable.getBinding().filter(  new sap.ui.model.Filter({ 
-					filters: new sap.ui.model.Filter({ filters: aFilters, and: true }) , 
-					and: this.bAnd }) , "Application" )
+				this.oTable.getBinding().filter(  new sap.ui.model.Filter({
+					filters: this.aMultiFilter, 
+					and: this.bAnd
+				}) , "Application" )
 			}
 			
 			if (aFilters.length > 0){ 
