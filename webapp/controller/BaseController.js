@@ -26,6 +26,13 @@ sap.ui.define([
 	var MessageType = coreLibrary.MessageType;
 
 	return Controller.extend("com.blueboot.TemplateApp.controller.BaseController", {
+		
+		MessageBox: function(sMsg, oProps = {}){
+			return new Promise(function(fResolve){
+				oProps.onClose = function(oAction){fResolve(oAction)}
+				sap.m.MessageBox.show(sMsg, oProps)
+			})
+		},
 
 		set: function(sProperty, value){
 			if (!sProperty) {

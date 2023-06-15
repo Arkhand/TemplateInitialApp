@@ -83,7 +83,7 @@ sap.ui.define([
             this.oControl = oProps.oControl
             this.oModel = oProps.oModel
             this.sEntity = oProps.sEntity
-            this.aFitlers = oProps.aCols.filter(function (oCol) { return !!oCol.filtrable })
+
             this.title = oProps.title ? oProps.title : ''
             this.basicSearchText = oProps.basicSearchText ? oProps.basicSearchText : ''
             this.basicSearch = oProps.basicSearch ? oProps.basicSearch : false
@@ -91,8 +91,9 @@ sap.ui.define([
             this.supportRangesOnly = !!oProps.supportRangesOnly
             this.aAlwaysFilters = oProps.aFilters
             this.waitGoButton = !!oProps.waitGoButton
-
-            oProps.aCols.forEach(function (oCol) {
+			
+			this.aCols = oProps.aCols
+            this.aCols.forEach(function (oCol) {
                 if (oCol.key) {
                     this.key = oCol.template
                     this.descriptionKey = oCol.descriptionKey ? oCol.descriptionKey : oCol.template
@@ -102,15 +103,17 @@ sap.ui.define([
                 oCol.filterType = oCol.filterType ? oCol.filterType : 'String'
             }.bind(this))
             
-            this.aCols = oProps.aCols.filter(function (oCol) { return !oCol.hideColumn })
+            this.aFitlers = this.aCols.filter(function (oCol) { return !!oCol.filtrable })
+            this.aCols = this.aCols.filter(function (oCol) { return !oCol.hideColumn })
 
             this._determineMultiSelect()
-
-            if (this._determineMultiSelect){
+	
+			if (this._determineMultiSelect){
 	            this.supportRanges = !!(oProps.supportRanges && this.supportMultiselect)
 	            this.supportRangesOnly = !!(oProps.supportRangesOnly && this.supportMultiselect)
 			}
-        }
+				
+		}
 
         createVhDialog() {
             this._oValueHelpDialog = new ValueHelpDialog({

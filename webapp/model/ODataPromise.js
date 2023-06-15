@@ -6,10 +6,6 @@ sap.ui.define([ ], function ( ) {
 				this.model = model;
 		}
 
-		createKey(path,oKeys){
-			return this.model.createKey(path, oKeys);
-		}
-
 		create(path, data, parameters) {
 			return new Promise((resolve, reject) => {
 				let completeParameters = this._addReturns(parameters, resolve, reject);

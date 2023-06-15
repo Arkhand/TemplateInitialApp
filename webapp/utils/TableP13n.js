@@ -806,5 +806,39 @@ sap.ui.define([
 			this._applyP13n();
 		}
 		
+		onExportData() {
+        	let dNow = new Date();
+        	let sFileName = dNow.toLocaleDateString() + "_" + dNow.toLocaleTimeString();
+          
+            let oRowBinding = this.oTable.getBinding().oList;
+            let aCols = this.oTable.getColumns()
+            
+            let oWorkbook = {
+            	columns: [],
+                hierarchyLevel: "Level"
+            }
+            
+            aCols.forEach(function(oCol){
+            	if (!oCol.mProperties.sortProperty) return
+            	oWorkbook.columns.push({
+            		label: oCol.getName(),
+            		property: oCol.mProperties.sortProperty
+            	})
+            });
+            
+            let oSettings = {
+                workbook: oWorkbook,
+                dataSource: oRowBinding,
+                fileName: sFileName,
+                worker: false
+            };
+            
+            jQuery.sap.require("sap.ui.export.Spreadsheet");
+            let oSheet = new sap.ui.export.Spreadsheet(oSettings);
+            oSheet.build().finally(function () {
+                oSheet.destroy();
+            });
+        }
+		
 	};
 });

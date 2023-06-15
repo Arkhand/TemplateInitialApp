@@ -130,7 +130,7 @@ sap.ui.define([
 					case 'sap.m.ComboBox':
 						aFilters = this.getComboBoxFilter( oComponent, sProperty); 
 						break
-					case 'sap.m.DynamicDateRange':
+					case 'com.blueboot.smartplanning.controls.DynamicDateRange':
 						aFilters = this.getDynamicDateRangeFilter(oComponent, sProperty);
 						break
 				}
@@ -196,7 +196,7 @@ sap.ui.define([
 					return oComponent.getSelectedKeys();
 				case 'sap.m.ComboBox':
 					return oComponent.getSelectedKeys();
-				case 'sap.m.DynamicDateRange':
+				case 'com.blueboot.smartplanning.controls.DynamicDateRange':
 					return oComponent.getValue() ? oComponent.getValue() : null;
 			}
 		}
@@ -248,7 +248,7 @@ sap.ui.define([
 				case 'sap.m.ComboBox':
 					oComponent.setSelectedKeys(data);
 					break
-				case 'sap.m.DynamicDateRange':
+				case 'com.blueboot.smartplanning.controls.DynamicDateRange':
 					if (data.operator === 'DATE' ) data.values = data.values.map(e=>new Date(e))
 					oComponent.setValue(data)
 					break;
@@ -344,7 +344,8 @@ sap.ui.define([
 				let oRange = {... oToken.data().range }
 				if (Object.entries(oRange).length){
 					if ( oRange.operation === 'Empty' ) {
-						oRange.operation = oRange.value1 && oRange.value1.includes('*') ?  FilterOperator.Contains : FilterOperator.EQ
+						// oRange.operation = oRange.value1 && oRange.value1.includes('*') ?  FilterOperator.Contains : FilterOperator.EQ
+						oRange.operation = FilterOperator.EQ
 					}
 					if ( oRange.operation === FilterOperator.EQ && oRange.exclude === true) {
 						oRange.operation = FilterOperator.NE
@@ -357,10 +358,10 @@ sap.ui.define([
 					}));
 				} else {
 					let sValue = oToken.getKey()
-					let sOperator = sValue.includes('*') ? FilterOperator.Contains : FilterOperator.EQ
+					// let sOperator = sValue.includes('*') ? FilterOperator.Contains : FilterOperator.EQ
 					aFilters.push(new Filter({
 						path: sProperty,
-						operator: sOperator,
+						operator: FilterOperator.EQ,
 						value1: sValue
 					}));
 				}
@@ -369,10 +370,10 @@ sap.ui.define([
 			//No tokenizado
 			if ( oMultiInput.getValue() && oMultiInput.getValue().length > 0 ){
 					let sValue = oMultiInput.getValue()
-					let sOperator = sValue.includes('*') ? FilterOperator.Contains : FilterOperator.EQ
+					// let sOperator = sValue.includes('*') ? FilterOperator.Contains : FilterOperator.EQ
 					aFilters.push(new Filter( {
 						path: sProperty,
-						operator: sOperator,
+						operator: FilterOperator.EQ,
 						value1: oMultiInput.getValue()
 					}));
 			}
@@ -515,14 +516,26 @@ sap.ui.define([
 			 this.fReturnTilesParameters(sParams)
 			 
 			 var sVariantIdToApply = new URLSearchParams(sParams).get('svariant')
-			 if (!sVariantIdToApply) return
+			 //if (!sVariantIdToApply) return //Commented this line so always go through fApplyVariant
 			
 			var fApplyVariant = function (evt){
-				if (!this.oFilterBar.getVariantManagement()._getVariantById(sVariantIdToApply)){
+				//Is Standard variant as default? Then apply Global
+				var allVariants = this.oFilterBar.getVariantManagement().getAllVariants();
+				var defaultVariantId = this.oFilterBar.getVariantManagement().getDefaultVariantId();
+				var variantStandard = allVariants.find(function (v) { return v.getStandardVariant() });
+				var globalVariant;
+				if (defaultVariantId === variantStandard.getDefinition().fileName) {
+					globalVariant = allVariants.find(function (v) { return v.getProperty("name") === "Global"; });
+				}
+				var variantFromTileExist = this.oFilterBar.getVariantManagement()._getVariantById(sVariantIdToApply);
+				if (!variantFromTileExist && !globalVariant){
 					// sap.m.MessageBox.error("Selected variant does not exists");
 					return;
 				}
-				this.oFilterBar.getSmartVariant().setCurrentVariantId(sVariantIdToApply)
+				sVariantIdToApply = variantFromTileExist ? sVariantIdToApply : globalVariant ? globalVariant.getDefinition().fileName : "";
+				if (sVariantIdToApply) {
+					this.oFilterBar.getSmartVariant().setCurrentVariantId(sVariantIdToApply);
+				}
 			}
 
 			if (this.oFilterBar.isInitialised()){
