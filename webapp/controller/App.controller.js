@@ -57,7 +57,6 @@ sap.ui.define(
 				this.oDataModel.metadataLoaded().then(fnSetAppNotBusy);
 				this.oDataModel.attachMetadataFailed(fnMetadataFail);
 				this.oDataModel.metadataLoaded(true).then().catch(fnMetadataFail);
-
 			},
 
 
