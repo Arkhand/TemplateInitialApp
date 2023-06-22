@@ -16,9 +16,6 @@ sap.ui.define(
 			oMessageManager: null,
 			
 			onInit() {
-
-				this.initializations()
-
 				//Models
 				this.oDataModel = sap.ui.getCore().getModel("PM_SRV");
 				this.oGlobalModel = sap.ui.getCore().getModel();
@@ -27,7 +24,9 @@ sap.ui.define(
 				this.oMessageManager = sap.ui.getCore().getMessageManager();
 				this.getView().setModel(this.oMessageManager.getMessageModel(), "message");
 				this.oMessageManager.registerObject(this.getView(), true);
-
+				
+				this.initializations()
+				
 				this.metadataLoaderHanddle()
 			},
 			
